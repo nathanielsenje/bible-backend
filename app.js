@@ -10,11 +10,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// Route to fetch verse data from the ESV API
-app.get('/', async (req, res) => {
+// Route to fetch verse data from the ESV API with dynamic parameters
+app.get('/:book/:chapter/:verse', async (req, res) => {
   try {
+    const { book, chapter, verse } = req.params; // Extract parameters from request URL
+    const query = `${book}+${chapter}:${verse}`;
+
     const response = await axios.get(
-      'https://api.esv.org/v3/passage/text/?q=John+12:5',
+      `https://api.esv.org/v3/passage/text/?q=${query}`,
       {
         headers: {
           Authorization: 'Token cadcc75af1f6e2f7550c92ba5968606d3943cc56',
@@ -23,9 +26,9 @@ app.get('/', async (req, res) => {
     );
 
     const reference = response.data.canonical;
-    const verse = response.data.passages[0];
+    const passage = response.data.passages[0];
 
-    const serverResponse = [reference, verse]
+    const serverResponse = [reference, passage];
 
     console.log(serverResponse);
 
